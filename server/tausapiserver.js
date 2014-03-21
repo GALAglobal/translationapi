@@ -44,7 +44,7 @@ else
 			"id": generateUUID(),
 			"sourcelanguage":	"de",	
 			"targetlanguage":	"fr",	
-			"source":	"Das ist ein Test nach Französisch.",	
+			"source":	"Das ist ein Test nach FranzÃ¶sisch.",	
 			"target":	"",	
 			"mt":	"n",
 			"crowd":	"n",	
@@ -254,3 +254,4 @@ app.delete('/request/:id', function(req, res)
 });
 
 app.listen(process.env.PORT || 3412);
+
