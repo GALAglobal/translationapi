@@ -15,7 +15,7 @@ function generateUUID()
     return uuid;
 };
 
-var translationRequests; // an raaray with translation requests
+var translationRequests; // an arae with translation requests
 
 var translatioRequestsFile = "requests.txt";
 // write two inition requests in queue if external file requests.txt does not exist
@@ -29,36 +29,56 @@ else
 {
  translationRequests = 
 	[
-		{
-			"id": generateUUID(),
-			"sourcelanguage":	"de",	
-			"targetlanguage":	"en",	
-			"source":	"Das ist ein Test.",	
-			"target":	"",	
-			"mt":	"n",
-			"crowd":	"n",	
-			"professional":	"n",	
-			"postedit":	"n",	
-			"comment":	"We need a fast translation",
-			"translator":	"",	
-			"owner":	"TAUS",
-			"status":	"initial"	
+		{ "translationRequest":
+			{
+				"id": 				generateUUID(),
+				"sourceLanguage":	"de",	
+				"targetLanguage":	"en",	
+				"source":			"Das ist ein Test.",	
+				"target":			null,	
+				"mt":				false,
+				"crowd":			false,	
+				"professional":		false,	
+				"postedit":			false,	
+				"comment":			"We need a fast translation",
+				"translator":		"",	
+				"owner":			"TAUS",
+				"creationDatetime":	"2014-05-20T19:20+01:00",			
+				"status":			"initial"	
+			}
 		},
-		{
-			"id": generateUUID(),
-			"sourcelanguage":	"de",	
-			"targetlanguage":	"fr",	
-			"source":	"Das ist ein Test nach Französisch.",	
-			"target":	"",	
-			"mt":	"n",
-			"crowd":	"n",	
-			"professional":	"n",	
-			"postedit":	"n",	
-			"comment":	"We need a fast translation",
-			"translator":	"",	
-			"owner":	"Heartsome",
-			"status":	"initial"	
+		{ "translationRequest":
+			{
+				"id": 				generateUUID(),
+				"sourceLanguage":	"de",	
+				"sourceLanguage":	"fr",	
+				"source":			"Das ist ein Test nach Französisch.",	
+				"target":			"",	
+				"mt":				false,
+				"crowd":			false,	
+				"professional":		false,	
+				"postedit":			false,	
+				"comment":			"We need a fast translation",
+				"translator":		"",	
+				"owner":			"Heartsome",
+				"creationDatetime":	"2014-05-20T19:20+01:00",
+				"status":			"initial"	
+			}
+		},
+		{ "translationRequest":
+			{
+				"id":				generateUUID(),
+				"sourceLanguage":	"de-de",
+				"targetLanguage":	"en-en",
+				"source":			"Hallo Welt",
+				"professional":		true,
+				"mt":				false,
+				"creationDatetime":	"2014-05-20T19:20+01:00",
+				"updateCounter":	0,
+				"status":			"initial"
+			}
 		}
+
 	];
 }
 
@@ -100,7 +120,8 @@ function findTranslationRequestIndex(id)
 			// we need to check if req.params.id is contained in there
 			for (var i = 0; i < translationRequests.length; ++i)
 			{
-				if (translationRequests[i].id == id)
+				var transReq = translationRequests[i].translationRequest;
+				if (transReq.id == id)
 				{
 					return i;
 				}
@@ -137,21 +158,145 @@ app.get('/translation/:id', function(req, res)
 
 app.put('/translation/:id', function(req, res) 
 {
+	var request = req.body.translationRequest;
+	if (request == undefined)
+	{
+		console.log(req);
+		res.statusCode = 400;
+		return res.send('Error 400: Post syntax incorrect. translationRequest for PUT property missing');
+	}
+	
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
-		translationRequests[i].mt = 			req.body.mt;
-		translationRequests[i].sourcelanguage = req.body.sourcelanguage;
-		translationRequests[i].targetlanguage = req.body.targetlanguage,
-		translationRequests[i].source = 		req.body.source,
-		translationRequests[i].target = 		req.body.target,
-		translationRequests[i].crowd =			req.body.crowd,	
-		translationRequests[i].professional =	req.body.professional,	
-		translationRequests[i].postedit =		req.body.postedit,	
-		translationRequests[i].comment =		req.body.comment,
-		translationRequests[i].translator =		req.body.translator,	
-		translationRequests[i].owner =			req.body.owner,
-		translationRequests[i].status =			req.body.status
+		if (request.mt != undefined)
+			translationRequests[i].translationRequest.mt = 					request.mt;
+		if (request.sourceLanguage != undefined)
+			translationRequests[i].translationRequest.sourceLanguage =  	request.sourceLanguage;
+		if (request.targetLanguage != undefined)
+			translationRequests[i].translationRequest.targetLanguage =  	request.targetLanguage;
+		if (request.source != undefined)
+			translationRequests[i].translationRequest.source = 				request.source;
+		if (request.target != undefined)
+			translationRequests[i].translationRequest.target = 				request.target;
+		if (request.crowd != undefined)
+			translationRequests[i].translationRequest.crowd =				request.crowd;	
+		if (request.professional != undefined)
+			translationRequests[i].translationRequest.professional =		request.professional;	
+		if (request.postedit != undefined)
+			translationRequests[i].translationRequest.postedit =			request.postedit;	
+		if (request.comment != undefined)
+			translationRequests[i].translationRequest.comment =				request.comment;
+		if (request.translator != undefined)
+			translationRequests[i].translationRequest.translator =			request.translator;	
+		if (request.owner != undefined)
+			translationRequests[i].translationRequest.owner =				request.owner;
+		if (request.status != undefined)
+			translationRequests[i].translationRequest.status =				request.status;
+		translationRequests[i].translationRequest.modificationDate =		new Date();
+		
+		if (translationRequests[i].translationRequest.updateCounter == undefined)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else if (translationRequests[i].translationRequest.updateCounter == null)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else
+			translationRequests[i].translationRequest.updateCounter =		request.updateCounter + 1;
+		saveTranslationRequests();
+		res.statusCode = 200;
+		res.json(translationRequests[i]);
+		return;
+	}
+
+	res.statusCode = 404;
+	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+});
+
+app.put('/translation/confirm/:id', function(req, res) 
+{
+	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
+	if (i != null)
+	{
+		translationRequests[i].translationRequest.status =					"confirmed";
+		translationRequests[i].translationRequest.modificationDate =		new Date();
+		
+		if (translationRequests[i].translationRequest.updateCounter == undefined)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else if (translationRequests[i].translationRequest.updateCounter == null)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else
+			translationRequests[i].translationRequest.updateCounter =		translationRequests[i].translationRequest.updateCounter + 1;
+		saveTranslationRequests();
+		res.statusCode = 200;
+		res.json(translationRequests[i]);
+		return;
+	}
+
+	res.statusCode = 404;
+	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+});
+
+app.put('/translation/cancel/:id', function(req, res) 
+{
+	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
+	if (i != null)
+	{
+		translationRequests[i].translationRequest.status =					"cancel";
+		translationRequests[i].translationRequest.modificationDate =		new Date();
+		
+		if (translationRequests[i].translationRequest.updateCounter == undefined)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else if (translationRequests[i].translationRequest.updateCounter == null)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else
+			translationRequests[i].translationRequest.updateCounter =		translationRequests[i].translationRequest.updateCounter + 1;
+		saveTranslationRequests();
+		res.statusCode = 200;
+		res.json(translationRequests[i]);
+		return;
+	}
+
+	res.statusCode = 404;
+	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+});
+
+app.put('/translation/reject/:id', function(req, res) 
+{
+	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
+	if (i != null)
+	{
+		translationRequests[i].translationRequest.status =					"reject";
+		translationRequests[i].translationRequest.modificationDate =		new Date();
+		
+		if (translationRequests[i].translationRequest.updateCounter == undefined)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else if (translationRequests[i].translationRequest.updateCounter == null)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else
+			translationRequests[i].translationRequest.updateCounter =		translationRequests[i].translationRequest.updateCounter + 1;
+		saveTranslationRequests();
+		res.statusCode = 200;
+		res.json(translationRequests[i]);
+		return;
+	}
+
+	res.statusCode = 404;
+	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+});
+
+app.put('/translation/accept/:id', function(req, res) 
+{
+	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
+	if (i != null)
+	{
+		translationRequests[i].translationRequest.status =					"accept";
+		translationRequests[i].translationRequest.modificationDate =		new Date();
+		
+		if (translationRequests[i].translationRequest.updateCounter == undefined)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else if (translationRequests[i].translationRequest.updateCounter == null)
+			translationRequests[i].translationRequest.updateCounter = 1;
+		else
+			translationRequests[i].translationRequest.updateCounter =		translationRequests[i].translationRequest.updateCounter + 1;
 		saveTranslationRequests();
 		res.statusCode = 200;
 		res.json(translationRequests[i]);
@@ -164,32 +309,52 @@ app.put('/translation/:id', function(req, res)
 
 app.post('/translation/', function(req, res) 
 {
-	if(!req.body.hasOwnProperty('sourcelanguage') 
-		|| !req.body.hasOwnProperty('targetlanguage') 
-		|| !req.body.hasOwnProperty('source')) 
+	/*
+	if(!req.body.hasOwnProperty('translationRequest')) 
+		// || !req.body.hasOwnProperty('targetLanguage') 
+		// || !req.body.hasOwnProperty('source')) 
 	{
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
+	
+	*/
+	
+	var request = req.body.translationRequest;
+	if (request == undefined)
+	{
+		console.log(req);
+		res.statusCode = 400;
+		return res.send('Error 400: Post syntax incorrect. translationRequest for POST property missing');
+	}
 
+	var d = new Date();
+	
 	var newQuote = 
 	{
 		id: generateUUID(),
-		sourcelanguage : req.body.sourcelanguage,
-		targetlanguage : req.body.targetlanguage,
-		source : req.body.source,
-		target : req.body.target,
-		mt:	req.body.mt,
-		crowd:	req.body.crowd,	
-		professional:	req.body.professional,	
-		postedit:	req.body.postedit,	
-		comment:	req.body.comment,
-		translator:	req.body.translator,	
-		owner:	req.body.owner,
-		status:	req.body.status
+		sourceLanguage : request.sourceLanguage,
+		targetLanguage : request.targetLanguage,
+		source : 		request.source,
+		target : 		request.target,
+		mt:				request.mt,
+		crowd:			request.crowd,	
+		professional:	request.professional,	
+		postedit:		request.postedit,	
+		comment:		request.comment,
+		translator:		request.translator,	
+		owner:			request.owner,
+		status:			request.status,
+		creationDatetime: d,
+		updateCounter: 0
 	};
+	
+	var newTranslationRequest = 
+	{
+		translationRequest: newQuote
+	}
 
-	translationRequests.push(newQuote);
+	translationRequests.push(newTranslationRequest);
 
 	saveTranslationRequests();
 	res.statusCode = 201;
