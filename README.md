@@ -25,7 +25,7 @@ To quickly install node packages,
 
 `Open terminal --> navigate to the root of the application and type: npm install`
 
-npm will now install the dependencies into a node_modules folder in the project.
+npm will now install the dependencies into a `node_modules` folder in the project.
 
 Starting the server
 ----------
@@ -36,17 +36,17 @@ Troubleshooting
 ----------
 If you see the below error in termial after tring to start the server,
 
-```
+```json
 Error: listen EADDRINUSE
     at errnoException (net.js:904:11)
     at Server._listen2 (net.js:1042:14)
     at listen (net.js:1064:10)
     at Server.listen (net.js:1138:5)
-    ```
+```
 
 then the port number specified in the translation api server is already in use.
 
 **Quick fix**
 `Type in terminal: killall -9 node` 
 
-Now start the server again
+Now start the server again!
