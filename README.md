@@ -34,7 +34,7 @@ To start the server,
 
 Troubleshooting
 ----------
-If you see the below error in termial after tring to start the server,
+If you see the below error in termial after trying to start the server,
 
 ```linux
 Error: listen EADDRINUSE
