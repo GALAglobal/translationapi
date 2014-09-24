@@ -1,0 +1,8 @@
+{
+	"name": "taus-api",
+	"main": "tausapiserver.js",
+	"dependencies": {
+		"express": "~3.0.0",
+		"js2xmlparser": "~0.1.5"
+	}
+}
