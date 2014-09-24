@@ -36,7 +36,7 @@ Troubleshooting
 ----------
 If you see the below error in termial after tring to start the server,
 
-```json
+```linux
 Error: listen EADDRINUSE
     at errnoException (net.js:904:11)
     at Server._listen2 (net.js:1042:14)
