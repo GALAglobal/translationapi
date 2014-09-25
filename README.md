@@ -22,7 +22,7 @@ As with all of our node projects, the packages required by the translation API i
 #1. Instructions - mac os#
 
 ##1.1 Installing Node.js##
-If you already have nNode.js installed on your computer, then move skip this section and move to section 1.2.
+If you already have Node.js installed on your computer, then skip this section and move to section 1.2.
 
 Node.js® is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.
 
