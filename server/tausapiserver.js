@@ -80,7 +80,7 @@ function generateUUID()
 var translationRequests; // an arae with translation requests
 
 var translatioRequestsFile = "requests.txt";
-// write two inition requests in queue if external file requests.txt does not exist
+// write two initial requests in queue if external file requests.txt does not exist
 
 if (fs.existsSync("requests.txt"))
 {
@@ -306,19 +306,16 @@ function findTranslationRequest(id)
 }
 
 // find the index in the translationRequests array based on the id
-// id is either an index itself or the id of the translation inex to be search for attribute id
+// id is either an index itself or the id of the translation index to be search for attribute id
 function findTranslationRequestIndex(id) 
 {
 	try
 	{
 		var index = parseInt(id);
-		if ((!isNaN(index)) && (index >= 0) && (translationRequests.length > index))
-		{
-			return index;
-		}
-		else
+		if (isNaN(id))
 		{
 			// we need to check if req.params.id is contained in there
+			console.log("Parsed not an int: " + id + " - " + index);
 			for (var i = 0; i < translationRequests.length; ++i)
 			{
 				var transReq = translationRequests[i].translationRequest;
@@ -327,6 +324,17 @@ function findTranslationRequestIndex(id)
 					return i;
 				}
 			}
+			return null;
+		}
+		else if ((!isNaN(index)) && (index >= 0) && (translationRequests.length > index))
+		{
+			console.log("Parsed int: " + id + " - " + index);
+			return index;
+		}
+		else
+		{
+			// we need to check if req.params.id is contained in there
+			console.log("Curious case: " + id + " - " + index);
 			return null;
 		}
 	}
@@ -737,14 +745,20 @@ app.put(translationMethodName, createNewRequest); // just for security, not real
 
 app.delete(translationMethodName +':id', function(req, res) 
 {
-	var index = findTranslationRequestIndex(req.params.id) 
+	var index = findTranslationRequestIndex(req.params.id);
 	if (index != null)
 	{
+		console.log("delete: " + req.params.id + " >> " + index + " - translationRequests: " + translationRequests.length);
 		translationRequests.splice(index, 1);
 		saveTranslationRequests();
+		console.log("delete - translationRequests: " + translationRequests.length);
 		res.statusCode = 204;
 		res.json(true);
 		return;
+	}
+	else
+	{
+		console.log("delete: " + req.params.id + " not found ");
 	}
 
 	res.statusCode = 404;
