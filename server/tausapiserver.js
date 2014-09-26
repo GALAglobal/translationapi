@@ -27,6 +27,7 @@ SOFTWARE.
 Author: Klemens Waldhör
 Version 2.0b / 24.09.2014
 Version 2.0c / 25.09.2014
+Version 2.0d / 26.09.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -51,6 +52,8 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  * - added comments
  * v2.0c
  * - attribute check for post, put of request
+ * v2.0d
+ Minor correction: method names as variables
 */
 
 
@@ -140,6 +143,19 @@ else
 
 	];
 }
+
+/*********************************************************************************************************/
+/*
+* Methods supported by the TAUS API
+*/
+
+var translationMethodName = '/v2.0/translation/';
+
+var commentMethodName = '/v2.0/comment/';
+
+var scoreMethodName = '/v2.0/score/';
+
+var scoreMethodName = '/v2.0/callback/';
 
 /*********************************************************************************************************/
 
@@ -328,7 +344,7 @@ app.use(express.bodyParser());
  * requires no id, will support filter criteria too
  */
 
-app.get('/v2.0/translation/', function(req, res) 
+app.get(translationMethodName, function(req, res) 
 {
 	res.set('Content-Type', 'application/json');
 	res.statusCode = 200;
@@ -346,7 +362,7 @@ app.get('/v2.0/translation/', function(req, res)
  * requires an id
  */
 
-app.get('/v2.0/translation/:id', function(req, res) 
+app.get(translationMethodName +':id', function(req, res) 
 {
 	var q = findTranslationRequest(req.params.id);
 	if (q != null)
@@ -367,7 +383,7 @@ app.get('/v2.0/translation/:id', function(req, res)
  * requires an id
  */
  
-app.get('/v2.0/translation/status/:id', function(req, res) 
+app.get(translationMethodName +'status/:id', function(req, res) 
 {
 	// console.log(req);
 	var q = findTranslationRequest(req.params.id);
@@ -401,8 +417,9 @@ function update(req, res)
 	if (request == undefined)
 	{
 		console.log(req);
+		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
-		return res.send('Error 400: Put/Patch syntax incorrect. translationRequest for PUT property missing');
+		return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
 	}
 	
 	var correctAttributes = checkAttributes("translationRequest", request);
@@ -461,8 +478,8 @@ function update(req, res)
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 }
 
-app.put('/v2.0/translation/:id', update);
-app.patch('/v2.0/translation/:id', update);
+app.put(translationMethodName +':id', update);
+app.patch(translationMethodName +':id', update);
 
 /*********************************************************************************************************/
 /* 
@@ -494,8 +511,8 @@ function confirm(req, res)
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 }
 
-app.put('/v2.0/translation/confirm/:id', confirm);
-app.patch('/v2.0/translation/confirm/:id', confirm);
+app.put(translationMethodName +'confirm/:id', confirm);
+app.patch(translationMethodName +'confirm/:id', confirm);
 
 /*********************************************************************************************************/
 /* 
@@ -527,8 +544,8 @@ function cancel(req, res)
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 }
 
-app.put('/v2.0/translation/cancel/:id', cancel);
-app.patch('/v2.0/translation/cancel/:id', cancel);
+app.put(translationMethodName +'cancel/:id', cancel);
+app.patch(translationMethodName +'cancel/:id', cancel);
 
 /*********************************************************************************************************/
 /* 
@@ -560,8 +577,8 @@ function reject(req, res)
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 }
 
-app.put('/v2.0/translation/reject/:id', reject);
-app.patch('/v2.0/translation/reject/:id', reject);
+app.put(translationMethodName +'reject/:id', reject);
+app.patch(translationMethodName +'reject/:id', reject);
 
 /*********************************************************************************************************/
 /* 
@@ -593,8 +610,8 @@ function accept (req, res)
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 }
 
-app.put('/v2.0/translation/accept/:id', accept);
-app.patch('/v2.0/translation/accept/:id', accept);
+app.put(translationMethodName +'accept/:id', accept);
+app.patch(translationMethodName +'accept/:id', accept);
 
 /*********************************************************************************************************/
 /* 
@@ -610,8 +627,9 @@ function createNewRequest(req, res)
 	if (request == undefined)
 	{
 		console.log(req);
+		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
-		return res.send('Error 400: Post/Put syntax incorrect. translationRequest for POST property missing');
+		return res.send('Error 400: Post/Put (create) syntax incorrect. translationRequest for POST property missing');
 	}
 	console.log(req);
 	// console.log(req.body);
@@ -626,6 +644,7 @@ function createNewRequest(req, res)
 	{
 		res.statusCode = correctAttributes[1];
 		res.json( { error: { id: id, dateTime: d, errorMessage: correctAttributes[2], httpCode: correctAttributes[1], errorCode: correctAttributes[3], method: method, url: url, request: "translationRequest" } });
+		return;
 	}
 	
 
@@ -636,7 +655,7 @@ function createNewRequest(req, res)
 		[
 			{ 
 				"rel": "translation",
-				"href": url + "/translation/" + id,
+				"href": url + translationMethodName + id,
 				"type": "application/json",
 				"title": "Newly created translation request " + id + " + created on " + " " + d,
 				"type": "application/json",
@@ -644,25 +663,31 @@ function createNewRequest(req, res)
 			},
 			{ 
 				"rel": "translation.cancel",
-				"href": url + "http://localhost:3412/translation/cancel/" + id,
+				"href": url + translationMethodName +"cancel/" + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
 				"rel": "translation.confirm",
-				"href": url + "http://localhost:3412/translation/cancel/" + id,
+				"href": url + translationMethodName +"reject/" + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
 				"rel": "translation.reject",
-				"href": url + "http://localhost:3412/translation/cancel/" + id,
+				"href": url + translationMethodName + "confirm/" + id,
+				"type": "application/json",
+				"verb": "PATCH"
+			},
+			{ 
+				"rel": "translation.reject",
+				"href": url + translationMethodName + "accept/" + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
 				"rel": "translation.patch",
-				"href": url + "http://localhost:3412/translation/" + id,
+				"href": url + translationMethodName + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			}
@@ -701,8 +726,8 @@ function createNewRequest(req, res)
 	res.json(newQuote);
 }
 
-app.post('/v2.0/translation/', createNewRequest);
-app.put('/v2.0/translation/', createNewRequest); // just for security, not really needed
+app.post(translationMethodName, createNewRequest);
+app.put(translationMethodName, createNewRequest); // just for security, not really needed
 
 /*********************************************************************************************************/
 /* 
@@ -710,7 +735,7 @@ app.put('/v2.0/translation/', createNewRequest); // just for security, not reall
  * requires an id
  */
 
-app.delete('/v2.0/translation/:id', function(req, res) 
+app.delete(translationMethodName +':id', function(req, res) 
 {
 	var index = findTranslationRequestIndex(req.params.id) 
 	if (index != null)
