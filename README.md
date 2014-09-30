@@ -12,7 +12,7 @@ Node.js® is a platform built on Chrome's JavaScript runtime for easily building
 To install Node.js on mac os, visit http://nodejs.org/ and click install. This will download a pre-compiled binary package to your computer `node-vx.xx.xx.pkg`. Once the download is complete open the .pkg file which will open a installer that is quite similar to all the installation wizards available for mac. Follow the on screen instructions to complete the installation. 
 
 ###Windows###
-To install Node.js on mac os, visit http://nodejs.org/ and click Install. You will be prompted to download an .msi file that contains the installer. Save the .msi file to a location on your drive and launch the installer by double-clicking on it. Follow the on screen instructions to complete the installation.
+To install Node.js on windows os, visit http://nodejs.org/ and click Install. You will be prompted to download an .msi file that contains the installer. Save the .msi file to a location on your drive and launch the installer by double-clicking on it. Follow the on screen instructions to complete the installation.
 
 ###Testing the installation###
 
