@@ -1,6 +1,12 @@
 {
 	"name": "taus-api",
+	"version": "2.0d",
+	"description": "taus translation api server implementation",
 	"main": "tausapiserver.js",
+	"repository": {
+      		"type" : "git",
+      		"url" : "https://github.com/TAUSBV/translationapi.git"
+	},
 	"dependencies": {
 		"express": "~3.0.0",
 		"js2xmlparser": "~0.1.5"
