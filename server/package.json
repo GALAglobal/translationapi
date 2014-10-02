@@ -1,6 +1,5 @@
 {
 	"name": "taus-api",
-	"version": "2.0d",
 	"description": "taus translation api server implementation",
 	"main": "tausapiserver.js",
 	"repository": {
