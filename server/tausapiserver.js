@@ -28,6 +28,7 @@ Author: Klemens Waldhör
 Version 2.0b / 24.09.2014
 Version 2.0c / 25.09.2014
 Version 2.0d / 26.09.2014
+Version 2.0e / 06.10.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -53,17 +54,22 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  * v2.0c
  * - attribute check for post, put of request
  * v2.0d
- Minor correction: method names as variables
+ * Minor correction: method names as variables
+ * v2.0e add check for POST if translation request id is present; if yes, check if valid uuid and use; if invalid error message back (code 400); otherwise generate new id
+ * requires: Install the library with `npm install validator` 
 */
 
 
 var express = require('express');
 var js2xmlparser = require("js2xmlparser");
 var fs = require("fs");
+// added 06.10.2014 - for checking UUIDs
+var validator = require("validator");
 
 var app = express();
 
 app.use(express.bodyParser({uploadDir:'d:/temp/uploads'}));
+
 
 // generate an unique id for new requests
 function generateUUID()
@@ -315,7 +321,7 @@ function findTranslationRequestIndex(id)
 		if (isNaN(id))
 		{
 			// we need to check if req.params.id is contained in there
-			console.log("Parsed not an int: " + id + " - " + index);
+			// console.log("Parsed not an int supplied for id: " + id + " - " + index);
 			for (var i = 0; i < translationRequests.length; ++i)
 			{
 				var transReq = translationRequests[i].translationRequest;
@@ -358,10 +364,11 @@ app.get(translationMethodName, function(req, res)
 	res.statusCode = 200;
 	res.json(translationRequests);
 
-  console.log("=============================================================================");
-  console.log(req);
-  console.log("------------------------------------------------------------------------------");
-  console.log(res);
+	console.log("==============================================================================");
+	console.log(req);
+	console.log("------------------------------------------------------------------------------");
+	console.log(res);
+	console.log("******************************************************************************");
 });
 
 /*********************************************************************************************************/
@@ -383,6 +390,12 @@ app.get(translationMethodName +':id', function(req, res)
 
 	res.statusCode = 404;
 	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	
+	console.log("==============================================================================");
+	console.log(req);
+	console.log("------------------------------------------------------------------------------");
+	console.log(res);
+	console.log("******************************************************************************");
 });
 
 /*********************************************************************************************************/
@@ -428,10 +441,12 @@ function update(req, res)
 		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
 		return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+		
 	}
 	
 	var correctAttributes = checkAttributes("translationRequest", request);
 	var d = new Date();
+	// check for id and generate if necessary
 	var id = generateUUID();
 	console.log(correctAttributes);
 	// return [false, 400, "\"" + prop + "\" with value \"" + value + "\" not allowed for request \"" + method + "\""];
@@ -645,7 +660,22 @@ function createNewRequest(req, res)
 
 	var correctAttributes = checkAttributes("translationRequest", request);
 	var d = new Date();
-	var id = generateUUID();
+	console.log("Request ID: " + request.id);
+	if (request.id != undefined)
+	{
+		if (!validator.isUUID(request.id)) // error
+		{
+			// console.log(req);
+			console.log("Method: " + method + " Url: " + url + " Wrong UUID: " + request.id);
+			res.statusCode = 400;
+			return res.send('Error 400: POST syntax incorrect. UUID structure supplied not correct: ' + request.id);
+		}
+		id = request.id; 
+	}
+	else
+	{
+		id = generateUUID();
+	}
 	console.log(correctAttributes);
 	// return [false, 400, "\"" + prop + "\" with value \"" + value + "\" not allowed for request \"" + method + "\""];
 	if (correctAttributes[0] == false)

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <!--
 /*
@@ -48,6 +49,13 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  
  * Example call: http://localhost/xampp/tausapi/tausgui-restapi.html
 
+ * Using with Chome: add when starting Chrome: ==args ==disable-web-security (= replace by Minus symbol!)
+ e.g. "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" ==args ==disable-web-security
+ 
+ * Internet Explorer: Internet Options -> Security -> Security Settings -> Access data sources across domains -> Enable
+ 
+ * v0.2 06.10.2014
+ * added displaying all the id on load of page
 */
 -->
 
@@ -59,12 +67,13 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 	<!--  -->
 	<script type="text/javascript" src="js/jquery.rest.js"></script>
 	<script>
+
 		function getTranslations()
 		 {
 			var server = "http://localhost:3412/v2.0/translation/";
 			var client = new $.RestClient('http://localhost:3412/v2.0/');
 			var out = document.getElementById('result');
-			out.innerHTML = "Ausgabe<br />" + id;
+			out.innerHTML = "Ausgabe getTranslations - Query<br />";
 			client.add("translation");
 			var request = client.translation.read();
 			request.done(function (data)
@@ -72,7 +81,8 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 				// alert('I have data: ' + data);
 				out = document.getElementById('result');
 				var string = JSON.stringify(data);
-				out.innerHTML = "Ausgabe<br />" + string;
+				
+				out.innerHTML = "Ausgabe getTranslations<br />" + string;
 			});
 
 			return;
@@ -81,6 +91,25 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 		 function getTranslationId()
 		 {
 			var id = document.getElementById('id').value;
+			var out = document.getElementById('result');
+			out.innerHTML = "Ausgabe<br />" + id;
+			var server = "http://localhost:3412/v2.0/translation/";
+			var client = new $.RestClient('http://localhost:3412/v2.0/');
+			client.add("translation");
+			var request = client.translation.read(id);
+			request.done(function (data)
+			{
+				// alert('I have data: ' + data);
+				out = document.getElementById('result');
+				var string = JSON.stringify(data);
+				out.innerHTML = "Ausgabe<br />" + string;
+			});
+			return;
+		 }
+		 
+		 function getTranslationSelectID()
+		 {
+			var id = document.getElementById('select').value;
 			var out = document.getElementById('result');
 			out.innerHTML = "Ausgabe<br />" + id;
 			var server = "http://localhost:3412/v2.0/translation/";
@@ -152,9 +181,36 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 			});
 			return;
 		 }
+		 
+		 function getAllIds()
+		 {
+		 	var server = "http://localhost:3412/v2.0/translation/";
+			var client = new $.RestClient('http://localhost:3412/v2.0/');
+			var out = document.getElementById('result');
+			out.innerHTML = "Ausgabe getTranslations - Query<br />";
+			client.add("translation");
+			var request = client.translation.read();
+			request.done(function (data)
+			{
+				// alert('I have data: ' + data);
+				select = document.getElementById('select');
+				// now map over all ids
+				// string = "";
+				for (i in data)
+				{
+					// string = string + data[i].translationRequest.id + ";";
+					var option = document.createElement("option");
+					option.text = data[i].translationRequest.id;
+					select.add(option);
+				}
+			});
+
+			return;
+		 
+		 }
 	</script>
 </head>
-<body>
+<body onload="getAllIds();">
 <h1>Test TAUS API in Browser (v2.0)</h1>
 This is a very simple demo site for testing the TAUS API server. Version 0.1 26.09.2014<br />
 <a href="" onclick="getTranslations();return false;">Get all translations</a><br />
@@ -164,7 +220,14 @@ This is a very simple demo site for testing the TAUS API server. Version 0.1 26.
 <hr>
 Note: This requires that "Cross-Origin Requests (CORS)" are activated depending on the server/client settings!
 <hr>
-Translation Request ID to use: <input type="text" name="id" value="697a6639-f8e4-47b1-bc77-865b6a9a53c2" id="id" size="80" />
+<table>
+<tr>
+<td>Translation Request IDs:</td><td><select id="select" onclick="getTranslationSelectID()"></select></td>
+</tr>
+<tr>
+<td>Translation Request ID to use:</td><td><input type="text" name="id" value="697a6639-f8e4-47b1-bc77-865b6a9a53c2" id="id" size="80" /></td>
+</tr>
+</table>
 <hr>
 <div id="result">
 </div>
