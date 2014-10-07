@@ -29,6 +29,7 @@ Version 2.0b / 24.09.2014
 Version 2.0c / 25.09.2014
 Version 2.0d / 26.09.2014
 Version 2.0e / 06.10.2014
+Version 2.0f / 07.10.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -57,6 +58,7 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  * Minor correction: method names as variables
  * v2.0e add check for POST if translation request id is present; if yes, check if valid uuid and use; if invalid error message back (code 400); otherwise generate new id
  * requires: Install the library with `npm install validator` 
+ * v2.0f - removed bug with PUT/POST when submitting same id again - https://github.com/TAUSBV/translationapi/issues/20#event-174771316
 */
 
 
@@ -668,8 +670,17 @@ function createNewRequest(req, res)
 			// console.log(req);
 			console.log("Method: " + method + " Url: " + url + " Wrong UUID: " + request.id);
 			res.statusCode = 400;
-			return res.send('Error 400: POST syntax incorrect. UUID structure supplied not correct: ' + request.id);
+			return res.send('Error 400: POST/PUT syntax incorrect. UUID structure supplied not correct: ' + request.id);
 		}
+		// 07.10.2014 - check if id exists
+		var i = findTranslationRequestIndex(request.id); // find id
+		if (i != null)
+		{
+			console.log("Method: " + method + " Url: " + url + " Wrong UUID: " + request.id);
+			res.statusCode = 400;
+			return res.send('Error 400: POST/PUT incorrect. UUID exist: ' + request.id);
+		}
+		
 		id = request.id; 
 	}
 	else
