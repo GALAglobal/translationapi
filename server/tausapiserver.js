@@ -713,30 +713,35 @@ function createNewRequest(req, res)
 			{ 
 				"rel": "translation.cancel",
 				"href": url + translationMethodName +"cancel/" + id,
+				"title": "Cancel translation request " + id,
+				"type": "application/json",
+				"verb": "PATCH"
+			},
+			{ 
+				"rel": "translation.reject",
+				"href": url + translationMethodName +"reject/" + id,
+				"title": "Reject translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
 				"rel": "translation.confirm",
-				"href": url + translationMethodName +"reject/" + id,
-				"type": "application/json",
-				"verb": "PATCH"
-			},
-			{ 
-				"rel": "translation.reject",
 				"href": url + translationMethodName + "confirm/" + id,
+				"title": "Confirm translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
-				"rel": "translation.reject",
+				"rel": "translation.accept",
 				"href": url + translationMethodName + "accept/" + id,
+				"title": "Accept translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
 			{ 
 				"rel": "translation.patch",
 				"href": url + translationMethodName + id,
+				"title": "Patch translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			}
