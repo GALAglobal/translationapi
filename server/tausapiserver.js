@@ -30,6 +30,7 @@ Version 2.0c / 25.09.2014
 Version 2.0d / 26.09.2014
 Version 2.0e / 06.10.2014
 Version 2.0f / 07.10.2014
+Version 2.0g / 15.10.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -59,6 +60,10 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  * v2.0e add check for POST if translation request id is present; if yes, check if valid uuid and use; if invalid error message back (code 400); otherwise generate new id
  * requires: Install the library with `npm install validator` 
  * v2.0f - removed bug with PUT/POST when submitting same id again - https://github.com/TAUSBV/translationapi/issues/20#event-174771316
+ * v2.0g
+	- + removed in POST for title link
+	- Z added to test entries for time
+	- json error returns for all implemented methods
 */
 
 
@@ -102,8 +107,8 @@ else
 		{ "translationRequest":
 			{
 				"id": 				generateUUID(),
-				"sourceLanguage":	"DE-DE",	
-				"targetLanguage":	"EN-US",	
+				"sourceLanguage":	"de-DE",	
+				"targetLanguage":	"en-US",	
 				"source":			"Das ist ein Test.",	
 				"target":			null,	
 				"mt":				false,
@@ -113,15 +118,15 @@ else
 				"comment":			"We need a fast translation",
 				"translator":		"",	
 				"owner":			"TAUS",
-				"creationDatetime":	"2014-05-20T19:20+01:00",			
-				"status":			"initial"	
+				"creationDatetime":	"2014-05-20T19:20+01:00Z",			
+				"status":			"initial"
 			}
 		},
 		{ "translationRequest":
 			{
 				"id": 				generateUUID(),
-				"sourceLanguage":	"DE-DE",	
-				"sourceLanguage":	"FR-FR",	
+				"sourceLanguage":	"de-DE",	
+				"targetLanguage":	"fr-FR",	
 				"source":			"Das ist ein Test nach Französisch.",	
 				"target":			"",	
 				"mt":				false,
@@ -131,19 +136,19 @@ else
 				"comment":			"We need a fast translation",
 				"translator":		"",	
 				"owner":			"Heartsome",
-				"creationDatetime":	"2014-05-20T19:20+01:00",
+				"creationDatetime":	"2014-05-20T19:20+01:00Z",
 				"status":			"initial"	
 			}
 		},
 		{ "translationRequest":
 			{
 				"id":				generateUUID(),
-				"sourceLanguage":	"DE-DE",
-				"targetLanguage":	"EN-GB",
+				"sourceLanguage":	"de-DE",
+				"targetLanguage":	"en-GB",
 				"source":			"Hallo Welt",
 				"professional":		true,
 				"mt":				false,
-				"creationDatetime":	"2014-05-20T19:20+01:00",
+				"creationDatetime":	"2014-05-20T19:20+01:00Z",
 				"updateCounter":	0,
 				"status":			"initial"
 			}
@@ -362,6 +367,9 @@ app.use(express.bodyParser());
 
 app.get(translationMethodName, function(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	res.set('Content-Type', 'application/json');
 	res.statusCode = 200;
 	res.json(translationRequests);
@@ -381,6 +389,9 @@ app.get(translationMethodName, function(req, res)
 
 app.get(translationMethodName +':id', function(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var q = findTranslationRequest(req.params.id);
 	if (q != null)
 	{
@@ -391,13 +402,17 @@ app.get(translationMethodName +':id', function(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
 	
 	console.log("==============================================================================");
 	console.log(req);
 	console.log("------------------------------------------------------------------------------");
 	console.log(res);
 	console.log("******************************************************************************");
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 4000, method: method, url: url, request: "translationRequest" } });
+	return;
 });
 
 /*********************************************************************************************************/
@@ -409,6 +424,9 @@ app.get(translationMethodName +':id', function(req, res)
 app.get(translationMethodName +'status/:id', function(req, res) 
 {
 	// console.log(req);
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var q = findTranslationRequest(req.params.id);
 	// console.log(q);
 	if (q != null)
@@ -423,7 +441,9 @@ app.get(translationMethodName +'status/:id', function(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 4010, method: method, url: url, request: "translationRequest" } });
+	return;
 });
 
 /*********************************************************************************************************/
@@ -437,17 +457,19 @@ function update(req, res)
 	var request = req.body.translationRequest;
 	var method = req.method;
 	var url = req.url;
+		var d = new Date();
 	if (request == undefined)
 	{
 		console.log(req);
 		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
-		return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
-		
+		// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+		var errormessage = "Method: " + method + " Url: " + url + " Put/Patch (update) syntax incorrect. translationRequest for PUT property missing " + req.params.id;
+		res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 5000, method: method, url: url, request: "translationRequest" } });
+		return;
 	}
 	
 	var correctAttributes = checkAttributes("translationRequest", request);
-	var d = new Date();
 	// check for id and generate if necessary
 	var id = generateUUID();
 	console.log(correctAttributes);
@@ -500,7 +522,10 @@ function update(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest id found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 5000, method: method, url: url, request: "translationRequest" } });
+	return;
 }
 
 app.put(translationMethodName +':id', update);
@@ -514,6 +539,9 @@ app.patch(translationMethodName +':id', update);
 
 function confirm(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
@@ -533,7 +561,10 @@ function confirm(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest id found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 5000, method: method, url: url, request: "translationRequest" } });
+	return;
 }
 
 app.put(translationMethodName +'confirm/:id', confirm);
@@ -547,6 +578,9 @@ app.patch(translationMethodName +'confirm/:id', confirm);
  
 function cancel(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
@@ -566,7 +600,9 @@ function cancel(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest id found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 5010, method: method, url: url, request: "translationRequest" } });
+	return;
 }
 
 app.put(translationMethodName +'cancel/:id', cancel);
@@ -580,6 +616,9 @@ app.patch(translationMethodName +'cancel/:id', cancel);
 
 function reject(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
@@ -599,7 +638,10 @@ function reject(req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest id found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 5020, method: method, url: url, request: "translationRequest" } });
+	return;
 }
 
 app.put(translationMethodName +'reject/:id', reject);
@@ -613,6 +655,9 @@ app.patch(translationMethodName +'reject/:id', reject);
 
 function accept (req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
@@ -632,7 +677,10 @@ function accept (req, res)
 	}
 
 	res.statusCode = 404;
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest id found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 5030, method: method, url: url, request: "translationRequest" } });
+	return;
 }
 
 app.put(translationMethodName +'accept/:id', accept);
@@ -649,28 +697,34 @@ function createNewRequest(req, res)
 	var request = req.body.translationRequest;
 	var method = req.method;
 	var url = req.url;
+	var d = new Date();
 	if (request == undefined)
 	{
 		console.log(req);
 		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
-		return res.send('Error 400: Post/Put (create) syntax incorrect. translationRequest for POST property missing');
+		// return res.send('Error 400: Post/Put (create) syntax incorrect. translationRequest for POST property missing');
+		var errormessage = "Method: " + method + " Url: " + url;
+		res.json( { error: { id: request.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 2000, method: method, url: url, request: "translationRequest" } });
+		return;
 	}
 	console.log(req);
 	// console.log(req.body);
     // console.log(req.files);
 
 	var correctAttributes = checkAttributes("translationRequest", request);
-	var d = new Date();
 	console.log("Request ID: " + request.id);
 	if (request.id != undefined)
 	{
 		if (!validator.isUUID(request.id)) // error
 		{
 			// console.log(req);
+			var errormessage = "Method: " + method + " Url: " + url + " Wrong UUID: " + request.id;
 			console.log("Method: " + method + " Url: " + url + " Wrong UUID: " + request.id);
 			res.statusCode = 400;
-			return res.send('Error 400: POST/PUT syntax incorrect. UUID structure supplied not correct: ' + request.id);
+			res.json( { error: { id: request.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 2010, method: method, url: url, request: "translationRequest" } });
+			return;
+			//return res.send('Error 400: POST/PUT syntax incorrect. UUID structure supplied not correct: ' + request.id);
 		}
 		// 07.10.2014 - check if id exists
 		var i = findTranslationRequestIndex(request.id); // find id
@@ -678,7 +732,10 @@ function createNewRequest(req, res)
 		{
 			console.log("Method: " + method + " Url: " + url + " Wrong UUID: " + request.id);
 			res.statusCode = 400;
-			return res.send('Error 400: POST/PUT incorrect. UUID exist: ' + request.id);
+			// return res.send('Error 400: POST/PUT incorrect. UUID exist: ' + request.id);
+			var errormessage = "Method: " + method + " Url: " + url + " POST/PUT incorrect. UUID exist: " + request.id;
+			res.json( { error: { id: request.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 2020, method: method, url: url, request: "translationRequest" } });
+			return;
 		}
 		
 		id = request.id; 
@@ -706,9 +763,17 @@ function createNewRequest(req, res)
 				"rel": "translation",
 				"href": url + translationMethodName + id,
 				"type": "application/json",
-				"title": "Newly created translation request " + id + " + created on " + " " + d,
+				"title": "Newly created translation request " + id + " created on " + " " + d,
 				"type": "application/json",
 				"verb": "GET"
+			},
+			{ 
+				"rel": "translation",
+				"href": url + translationMethodName + id,
+				"type": "application/json",
+				"title": "Delete translation request " + id + " created on " + " " + d,
+				"type": "application/json",
+				"verb": "DELETE"
 			},
 			{ 
 				"rel": "translation.cancel",
@@ -720,6 +785,13 @@ function createNewRequest(req, res)
 			{ 
 				"rel": "translation.reject",
 				"href": url + translationMethodName +"reject/" + id,
+				"title": "Reject translation request " + id,
+				"type": "application/json",
+				"verb": "PATCH"
+			},
+			{ 
+				"rel": "translation.reject",
+				"href": url + translationMethodName +"status/" + id,
 				"title": "Reject translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
@@ -744,6 +816,13 @@ function createNewRequest(req, res)
 				"title": "Patch translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
+			},
+			{ 
+				"rel": "translation.put",
+				"href": url + translationMethodName + id,
+				"title": "PUT translation request " + id,
+				"type": "application/json",
+				"verb": "PUT"
 			}
 		]
 	;
@@ -791,6 +870,9 @@ app.put(translationMethodName, createNewRequest); // just for security, not real
 
 app.delete(translationMethodName +':id', function(req, res) 
 {
+	var method = req.method;
+	var url = req.url;
+	var d = new Date();
 	var index = findTranslationRequestIndex(req.params.id);
 	if (index != null)
 	{
@@ -808,9 +890,11 @@ app.delete(translationMethodName +':id', function(req, res)
 	}
 
 	res.statusCode = 404;
-	res.json(false);
-	return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
-
+	// res.json(false);
+	// return res.send('Error 404: No translationRequest ' + req.params.id + ' found');
+	var errormessage = "Method: " + method + " Url: " + url + " No translationRequest found " + req.params.id;
+	res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 404, errorCode: 3000, method: method, url: url, request: "translationRequest" } });
+	return;
 });
 
 /*********************************************************************************************************/
