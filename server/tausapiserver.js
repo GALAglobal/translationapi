@@ -31,6 +31,7 @@ Version 2.0d / 26.09.2014
 Version 2.0e / 06.10.2014
 Version 2.0f / 07.10.2014
 Version 2.0g / 15.10.2014
+Version 2.0h / 15.10.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -64,6 +65,7 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 	- + removed in POST for title link
 	- Z added to test entries for time
 	- json error returns for all implemented methods
+ * v2.0h - removed minor bugs
 */
 
 
@@ -102,59 +104,62 @@ if (fs.existsSync("requests.txt"))
 }
 else
 {
- translationRequests = 
-	[
-		{ "translationRequest":
-			{
-				"id": 				generateUUID(),
-				"sourceLanguage":	"de-DE",	
-				"targetLanguage":	"en-US",	
-				"source":			"Das ist ein Test.",	
-				"target":			null,	
-				"mt":				false,
-				"crowd":			false,	
-				"professional":		false,	
-				"postedit":			false,	
-				"comment":			"We need a fast translation",
-				"translator":		"",	
-				"owner":			"TAUS",
-				"creationDatetime":	"2014-05-20T19:20+01:00Z",			
-				"status":			"initial"
+	var id1 = generateUUID();
+	var id2 = generateUUID();
+	var id3 = generateUUID();
+	translationRequests = 
+		[
+			{ "translationRequest":
+				{
+					"id": 				id1,
+					"sourceLanguage":	"de-DE",	
+					"targetLanguage":	"en-US",	
+					"source":			"Das ist ein Test.",	
+					"target":			null,	
+					"mt":				false,
+					"crowd":			false,	
+					"professional":		false,	
+					"postedit":			false,	
+					"comment":			"We need a fast translation",
+					"translator":		"",	
+					"owner":			"TAUS",
+					"creationDatetime":	"2014-05-20T19:20:00Z",			
+					"status":			"initial",
+				}
+			},
+			{ "translationRequest":
+				{
+					"id": 				id2,
+					"sourceLanguage":	"de-DE",	
+					"targetLanguage":	"fr-FR",	
+					"source":			"Das ist ein Test nach Französisch.",	
+					"target":			"",	
+					"mt":				false,
+					"crowd":			false,	
+					"professional":		false,	
+					"postedit":			false,	
+					"comment":			"We need a fast translation",
+					"translator":		"",	
+					"owner":			"Heartsome",
+					"creationDatetime":	"2014-05-20T19:20:00Z",
+					"status":			"initial"	
+				}
+			},
+			{ "translationRequest":
+				{
+					"id":				id3,
+					"sourceLanguage":	"de-DE",
+					"targetLanguage":	"en-GB",
+					"source":			"Hallo Welt",
+					"professional":		true,
+					"mt":				false,
+					"creationDatetime":	"2014-05-20T19:20:00Z",
+					"updateCounter":	0,
+					"status":			"initial"
+				}
 			}
-		},
-		{ "translationRequest":
-			{
-				"id": 				generateUUID(),
-				"sourceLanguage":	"de-DE",	
-				"targetLanguage":	"fr-FR",	
-				"source":			"Das ist ein Test nach Französisch.",	
-				"target":			"",	
-				"mt":				false,
-				"crowd":			false,	
-				"professional":		false,	
-				"postedit":			false,	
-				"comment":			"We need a fast translation",
-				"translator":		"",	
-				"owner":			"Heartsome",
-				"creationDatetime":	"2014-05-20T19:20+01:00Z",
-				"status":			"initial"	
-			}
-		},
-		{ "translationRequest":
-			{
-				"id":				generateUUID(),
-				"sourceLanguage":	"de-DE",
-				"targetLanguage":	"en-GB",
-				"source":			"Hallo Welt",
-				"professional":		true,
-				"mt":				false,
-				"creationDatetime":	"2014-05-20T19:20+01:00Z",
-				"updateCounter":	0,
-				"status":			"initial"
-			}
-		}
 
-	];
+		];
 }
 
 /*********************************************************************************************************/
@@ -790,9 +795,9 @@ function createNewRequest(req, res)
 				"verb": "PATCH"
 			},
 			{ 
-				"rel": "translation.reject",
+				"rel": "translation.status",
 				"href": url + translationMethodName +"status/" + id,
-				"title": "Reject translation request " + id,
+				"title": "Status of translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
 			},
