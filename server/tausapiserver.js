@@ -374,7 +374,8 @@ app.get(translationMethodName, function(req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	res.set('Content-Type', 'application/json');
 	res.statusCode = 200;
 	res.json(translationRequests);
@@ -396,7 +397,8 @@ app.get(translationMethodName +':id', function(req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var q = findTranslationRequest(req.params.id);
 	if (q != null)
 	{
@@ -431,7 +433,8 @@ app.get(translationMethodName +'status/:id', function(req, res)
 	// console.log(req);
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var q = findTranslationRequest(req.params.id);
 	// console.log(q);
 	if (q != null)
@@ -462,7 +465,8 @@ function update(req, res)
 	var request = req.body.translationRequest;
 	var method = req.method;
 	var url = req.url;
-		var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	if (request == undefined)
 	{
 		console.log(req);
@@ -512,7 +516,7 @@ function update(req, res)
 			translationRequests[i].translationRequest.owner =				request.owner;
 		if (request.status != undefined)
 			translationRequests[i].translationRequest.status =				request.status;
-		translationRequests[i].translationRequest.modificationDate =		new Date();
+		translationRequests[i].translationRequest.modificationDate =		d;
 		
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
@@ -546,12 +550,13 @@ function confirm(req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
 		translationRequests[i].translationRequest.status =					"confirmed";
-		translationRequests[i].translationRequest.modificationDate =		new Date();
+		translationRequests[i].translationRequest.modificationDate =		d;
 		
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
@@ -585,7 +590,8 @@ function cancel(req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
@@ -623,12 +629,13 @@ function reject(req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
 		translationRequests[i].translationRequest.status =					"reject";
-		translationRequests[i].translationRequest.modificationDate =		new Date();
+		translationRequests[i].translationRequest.modificationDate =		d;
 		
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
@@ -662,13 +669,14 @@ function accept (req, res)
 {
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
 	if (i != null)
 	{
 		translationRequests[i].translationRequest.status =					"accept";
-		translationRequests[i].translationRequest.modificationDate =		new Date();
-		
+		translationRequests[i].translationRequest.modificationDate =		d;
+	
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
 		else if (translationRequests[i].translationRequest.updateCounter == null)
@@ -702,7 +710,8 @@ function createNewRequest(req, res)
 	var request = req.body.translationRequest;
 	var method = req.method;
 	var url = req.url;
-	var d = new Date();
+	var da = new Date();
+	var d = da.toUTCString();
 	if (request == undefined)
 	{
 		console.log(req);
@@ -710,7 +719,7 @@ function createNewRequest(req, res)
 		res.statusCode = 400;
 		// return res.send('Error 400: Post/Put (create) syntax incorrect. translationRequest for POST property missing');
 		var errormessage = "Method: " + method + " Url: " + url;
-		res.json( { error: { id: request.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 2000, method: method, url: url, request: "translationRequest" } });
+		res.json( { error: { id: "Undefined", dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 2000, method: method, url: url, request: "translationRequest" } });
 		return;
 	}
 	console.log(req);
