@@ -32,6 +32,7 @@ Version 2.0e / 06.10.2014
 Version 2.0f / 07.10.2014
 Version 2.0g / 15.10.2014
 Version 2.0h / 15.10.2014
+Version 2.0i / 06.11.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -66,6 +67,9 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
 	- Z added to test entries for time
 	- json error returns for all implemented methods
  * v2.0h - removed minor bugs
+ * v2.0 i 
+	- update/patch corrected 
+	- modificationDatetime correct name used now
 */
 
 
@@ -208,7 +212,8 @@ var allowedAttributes =
 			callbackURL: "url",
 			language: "language",
 			text: "string",
-			creationDatetime: "date"
+			creationDatetime: "date",
+			modificationDatetime: "date",
 		},
 	score:
 		{
@@ -221,7 +226,8 @@ var allowedAttributes =
 			crowd: ["true", "false"],
 			professional: ["true", "false"],
 			text: "string",
-			creationDatetime: "date"
+			creationDatetime: "date",
+			modificationDatetime: "date",
 		},
 	callbackRequest:
 		{
@@ -487,6 +493,7 @@ function update(req, res)
 	{
 		res.statusCode = correctAttributes[1];
 		res.json( { error: { id: id, requestId: req.params.id, dateTime: d, errorMessage: correctAttributes[2], httpCode: correctAttributes[1], errorCode: correctAttributes[3], method: method, url: url, request: "translationRequest" } });
+		return; // 06.11.2014
 	}
 	
 	var i = findTranslationRequestIndex(req.params.id); // need to adapt to the real id!
@@ -516,7 +523,15 @@ function update(req, res)
 			translationRequests[i].translationRequest.owner =				request.owner;
 		if (request.status != undefined)
 			translationRequests[i].translationRequest.status =				request.status;
-		translationRequests[i].translationRequest.modificationDate =		d;
+		
+		// 06.11.2014 modificationDatetime - problem solved
+		if (request.modificationDatetime != undefined)
+			translationRequests[i].translationRequest.modificationDatetime =		request.modificationDatetime;
+		else	
+			translationRequests[i].translationRequest.modificationDatetime =		d;
+		if (request.creationDatetime != undefined)
+			translationRequests[i].translationRequest.creationDatetime =			request.creationDatetime;
+		//
 		
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
