@@ -33,6 +33,7 @@ Version 2.0f / 07.10.2014
 Version 2.0g / 15.10.2014
 Version 2.0h / 15.10.2014
 Version 2.0i / 06.11.2014
+Version 2.0j / 12.11.2014
 
 TAUS Translation API – Version 2.0
 TAUS Technical Specification -­ A Common Translation Services API - August 2014
@@ -70,6 +71,9 @@ TAUS Technical Specification -­ A Common Translation Services API - August 2014
  * v2.0 i 
 	- update/patch corrected 
 	- modificationDatetime correct name used now
+ * v2.0j
+	- add date checking
+	- toISOString() for DateString production used
 */
 
 
@@ -95,6 +99,23 @@ function generateUUID()
     });
     return uuid;
 };
+
+// check if correct date - 12.11.2014
+
+function checkDate(dateString)
+{
+	try
+	{
+		var d = new Date(dateString);
+		if (d == "Invalid Date")
+			return false;
+		return true;
+	}
+	catch(ex)
+	{
+		return false;
+	}
+}
 
 var translationRequests; // an arae with translation requests
 
@@ -479,7 +500,7 @@ function update(req, res)
 		console.log("Method: " + method + " Url: " + url);
 		res.statusCode = 400;
 		// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
-		var errormessage = "Method: " + method + " Url: " + url + " Put/Patch (update) syntax incorrect. translationRequest for PUT property missing " + req.params.id;
+		var errormessage = "Method: " + method + " Url: " + url + " Put/Patch (update) syntax incorrect. translationRequest for PUT / PATCH property missing " + req.params.id;
 		res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 5000, method: method, url: url, request: "translationRequest" } });
 		return;
 	}
@@ -526,13 +547,37 @@ function update(req, res)
 		
 		// 06.11.2014 modificationDatetime - problem solved
 		if (request.modificationDatetime != undefined)
-			translationRequests[i].translationRequest.modificationDatetime =		request.modificationDatetime;
+		{
+			if (checkDate(request.modificationDatetime) != true)
+			{
+				console.log(req);
+				console.log("Method: " + method + " Url: " + url);
+				res.statusCode = 400;
+				// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+				var errormessage = "Method: " + method + " Url: " + url + " Put/Patch (update) modificationDatetime date syntax incorrect. " + req.params.id;
+				res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 6010, method: method, url: url, request: "translationRequest" } });
+				return;
+			}
+			var dx = new Date(request.modificationDatetime);
+			translationRequests[i].translationRequest.modificationDatetime =		dx.toISOString(); // dx.toUTCString();
+		}
 		else	
 			translationRequests[i].translationRequest.modificationDatetime =		d;
 		if (request.creationDatetime != undefined)
-			translationRequests[i].translationRequest.creationDatetime =			request.creationDatetime;
-		//
-		
+		{
+			if (checkDate(request.creationDatetime) != true)
+			{
+				console.log(req);
+				console.log("Method: " + method + " Url: " + url);
+				res.statusCode = 400;
+				// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+				var errormessage = "Method: " + method + " Url: " + url + " Put/Patch (update) creationDatetime date syntax incorrect. " + req.params.id;
+				res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 6020, method: method, url: url, request: "translationRequest" } });
+				return;
+			}
+			var dx = new Date(request.creationDatetime);
+			translationRequests[i].translationRequest.creationDatetime =			dx.toISOString(); // dx.toUTCString();
+		}
 		if (translationRequests[i].translationRequest.updateCounter == undefined)
 			translationRequests[i].translationRequest.updateCounter = 1;
 		else if (translationRequests[i].translationRequest.updateCounter == null)
@@ -782,6 +827,50 @@ function createNewRequest(req, res)
 		return;
 	}
 	
+	// check data attributes - 12.11.2014
+	var dmoddate = null;
+	if (request.modificationDatetime != undefined)
+	{
+		console.log("Check modificationDatetime");
+		if (checkDate(request.modificationDatetime) != true)
+		{
+			console.log(req);
+			console.log("Method: " + method + " Url: " + url);
+			res.statusCode = 400;
+			// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+			var errormessage = "Method: " + method + " Url: " + url + " POST modificationDatetime date syntax incorrect. ";
+			res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 6110, method: method, url: url, request: "translationRequest" } });
+			return;
+		}
+		var dx = new Date(request.modificationDatetime);		
+		dmoddate = dx.toISOString(); // dx.toUTCString();
+	}
+	else
+	{
+		dmoddate = d;
+	}
+	var dcreatedate = null;
+	if (request.creationDatetime != undefined)
+	{
+		console.log("Check creationDatetime");
+		if (checkDate(request.creationDatetime) != true)
+		{
+			console.log(req);
+			console.log("Method: " + method + " Url: " + url);
+			res.statusCode = 400;
+			// return res.send('Error 400: Put/Patch (update) syntax incorrect. translationRequest for PUT property missing');
+			var errormessage = "Method: " + method + " Url: " + url + " POST creationDatetime date syntax incorrect. ";
+			res.json( { error: { id: req.params.id, dateTime: d, errorMessage: errormessage, httpCode: 400, errorCode: 6120, method: method, url: url, request: "translationRequest" } });
+			return;
+		}
+		var dx = new Date(request.creationDatetime);		
+		dcreatedate = dx.toISOString(); // dx.toUTCString();
+	}
+	else
+	{
+		dcreatedate = d;
+	}
+	console.log("Dates ok!");
 
 	var url = "http://" + req.headers.host; // how to get the http part of host???? e.g. if it is https??
 	// this are some test links will require a description how to define them depending on request method, status ...
@@ -824,6 +913,13 @@ function createNewRequest(req, res)
 				"title": "Status of translation request " + id,
 				"type": "application/json",
 				"verb": "PATCH"
+			},
+			{ 
+				"rel": "translation.status",
+				"href": url + translationMethodName +"status/" + id,
+				"title": "Status of translation request " + id,
+				"type": "application/json",
+				"verb": "GET"
 			},
 			{ 
 				"rel": "translation.confirm",
@@ -871,7 +967,8 @@ function createNewRequest(req, res)
 		translator:		request.translator,	
 		owner:			request.owner,
 		status:			request.status,
-		creationDatetime: d,
+		creationDatetime: dcreatedate,
+		modificationDatetime: dmoddate,
 		updateCounter: 0,
 		links: links
 	};
