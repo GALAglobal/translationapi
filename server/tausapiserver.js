@@ -493,7 +493,7 @@ function update(req, res)
 	var method = req.method;
 	var url = req.url;
 	var da = new Date();
-	var d = da.toUTCString();
+	var d = da.toISOString();
 	if (request == undefined)
 	{
 		console.log(req);
@@ -771,7 +771,7 @@ function createNewRequest(req, res)
 	var method = req.method;
 	var url = req.url;
 	var da = new Date();
-	var d = da.toUTCString();
+	var d = da.toISOString();
 	if (request == undefined)
 	{
 		console.log(req);
