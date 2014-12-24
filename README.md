@@ -57,7 +57,7 @@ To start the server,
 
 You might be prompted to open access to the server by the firewall built into your operating system.
 
-###Port number in use on Un*x-based operating systems###
+###Port number in use on Unix-based operating systems###
 If you see the below error in the command prompt after trying to start the server,
 
 ```
