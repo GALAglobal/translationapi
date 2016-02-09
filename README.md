@@ -78,6 +78,6 @@ Now start the server again!
 ##Accessing the server##
 You can access the server in your browser at http://localhost:3412/v2.0/translation/ (the terminiating slash is significant!).
 
-For full access to the RESTful API use a REST client (some are available as browser plug-ins) and refer to the [TAUS Translation API v2.0 Specification](https://labs.taus.net/interoperability/taus-translation-api) for available methods.
+For full access to the RESTful API use a REST client (some are available as browser plug-ins) and refer to the [TAUS Translation API v2.0 Specification](https://translate.taus.net/file-downloads/download?path=TAUS_Translation_API%252Ftaus_translation_api-v2.0_august-2014.pdf) for available methods.
 
 
