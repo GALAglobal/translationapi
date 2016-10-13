@@ -11,5 +11,6 @@
 		"express": "~3.0.0",
 		"js2xmlparser": "~0.1.5",
 		"validator": "~3.19.1"
-	}
+	},
+     "scripts": { "start" : "node tausapiserver.js"}
 }
