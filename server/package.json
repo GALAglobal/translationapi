@@ -4,7 +4,7 @@
 	"main": "tausapiserver.js",
 	"repository": {
       		"type" : "git",
-      		"url" : "https://github.com/TAUSBV/translationapi.git"
+      		"url" : "https://github.com/GALAglobal/translationapi.git"
 	},
 
 	"dependencies": {
